@@ -34,8 +34,8 @@ Future<void> init() async {
   sl.registerLazySingleton<NumberTriviaRepository>(
     () => NumberTriviaRepositoryImpl(
       localDataSource: sl(),
-      networkInfo: sl(),
       remoteDataSource: sl(),
+      networkInfo: sl(),
     ),
   );
 

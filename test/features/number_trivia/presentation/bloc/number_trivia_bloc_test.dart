@@ -6,16 +6,20 @@ import 'package:clean_architecture_tdd_course/features/number_trivia/domain/usec
 import 'package:clean_architecture_tdd_course/features/number_trivia/domain/usecases/get_random_number_trivia.dart';
 import 'package:clean_architecture_tdd_course/features/number_trivia/presentation/bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class MockGetConcreteNumberTrivia extends Mock
-    implements GetConcreteNumberTrivia {}
+import 'number_trivia_bloc_test.mocks.dart';
 
-class MockGetRandomNumberTrivia extends Mock implements GetRandomNumberTrivia {}
+// class MockGetConcreteNumberTrivia extends Mock
+//     implements GetConcreteNumberTrivia {}
+//
+// class MockGetRandomNumberTrivia extends Mock implements GetRandomNumberTrivia {}
+//
+// class MockInputConverter extends Mock implements InputConverter {}
 
-class MockInputConverter extends Mock implements InputConverter {}
-
+@GenerateMocks([GetConcreteNumberTrivia, GetRandomNumberTrivia, InputConverter])
 void main() {
   late NumberTriviaBloc bloc;
   late MockGetConcreteNumberTrivia mockGetConcreteNumberTrivia;
@@ -45,7 +49,7 @@ void main() {
     final tNumberTrivia = NumberTrivia(number: 1, text: 'test trivia');
 
     void setUpMockInputConverterSuccess() =>
-        when(mockInputConverter.stringToUnsignedInteger(any ?? ''))
+        when(mockInputConverter.stringToUnsignedInteger(any))
             .thenReturn(Right(tNumberParsed));
 
     test(
@@ -55,8 +59,7 @@ void main() {
         setUpMockInputConverterSuccess();
         // act
         bloc.add(GetTriviaForConcreteNumber(tNumberString));
-        await untilCalled(
-            mockInputConverter.stringToUnsignedInteger(any ?? ''));
+        await untilCalled(mockInputConverter.stringToUnsignedInteger(any));
         // assert
         verify(mockInputConverter.stringToUnsignedInteger(tNumberString));
       },
@@ -66,7 +69,7 @@ void main() {
       'should emit [Error] when the input is invalid',
       () async {
         // arrange
-        when(mockInputConverter.stringToUnsignedInteger(any ?? ''))
+        when(mockInputConverter.stringToUnsignedInteger(any))
             .thenReturn(Left(InvalidInputFailure()));
         // assert later
         final expected = [
@@ -84,12 +87,11 @@ void main() {
       () async {
         // arrange
         setUpMockInputConverterSuccess();
-        when(mockGetConcreteNumberTrivia(any ?? Params(number: 213)))
+        when(mockGetConcreteNumberTrivia(any))
             .thenAnswer((_) async => Right(tNumberTrivia));
         // act
         bloc.add(GetTriviaForConcreteNumber(tNumberString));
-        await untilCalled(
-            mockGetConcreteNumberTrivia(any ?? Params(number: 213)));
+        await untilCalled(mockGetConcreteNumberTrivia(any));
         // assert
         verify(mockGetConcreteNumberTrivia(Params(number: tNumberParsed)));
       },
@@ -100,7 +102,7 @@ void main() {
       () async {
         // arrange
         setUpMockInputConverterSuccess();
-        when(mockGetConcreteNumberTrivia(any ?? Params(number: 213)))
+        when(mockGetConcreteNumberTrivia(any))
             .thenAnswer((_) async => Right(tNumberTrivia));
         // assert later
         final expected = [
@@ -119,7 +121,7 @@ void main() {
       () async {
         // arrange
         setUpMockInputConverterSuccess();
-        when(mockGetConcreteNumberTrivia(any ?? Params(number: 213)))
+        when(mockGetConcreteNumberTrivia(any))
             .thenAnswer((_) async => Left(ServerFailure()));
         // assert later
         final expected = [
@@ -138,7 +140,7 @@ void main() {
       () async {
         // arrange
         setUpMockInputConverterSuccess();
-        when(mockGetConcreteNumberTrivia(any ?? Params(number: 213)))
+        when(mockGetConcreteNumberTrivia(any))
             .thenAnswer((_) async => Left(CacheFailure()));
         // assert later
         final expected = [
@@ -160,11 +162,11 @@ void main() {
       'should get data from the random use case',
       () async {
         // arrange
-        when(mockGetRandomNumberTrivia(any ?? NoParams()))
+        when(mockGetRandomNumberTrivia(any))
             .thenAnswer((_) async => Right(tNumberTrivia));
         // act
         bloc.add(GetTriviaForRandomNumber());
-        await untilCalled(mockGetRandomNumberTrivia(any ?? NoParams()));
+        await untilCalled(mockGetRandomNumberTrivia(any));
         // assert
         verify(mockGetRandomNumberTrivia(NoParams()));
       },
@@ -174,7 +176,7 @@ void main() {
       'should emit [Loading, Loaded] when data is gotten successfully',
       () async {
         // arrange
-        when(mockGetRandomNumberTrivia(any ?? NoParams()))
+        when(mockGetRandomNumberTrivia(any))
             .thenAnswer((_) async => Right(tNumberTrivia));
         // assert later
         final expected = [
@@ -192,7 +194,7 @@ void main() {
       'should emit [Loading, Error] when getting data fails',
       () async {
         // arrange
-        when(mockGetRandomNumberTrivia(any ?? NoParams()))
+        when(mockGetRandomNumberTrivia(any))
             .thenAnswer((_) async => Left(ServerFailure()));
         // assert later
         final expected = [
@@ -210,7 +212,7 @@ void main() {
       'should emit [Loading, Error] with a proper message for the error when getting data fails',
       () async {
         // arrange
-        when(mockGetRandomNumberTrivia(any ?? NoParams()))
+        when(mockGetRandomNumberTrivia(any))
             .thenAnswer((_) async => Left(CacheFailure()));
         // assert later
         final expected = [
