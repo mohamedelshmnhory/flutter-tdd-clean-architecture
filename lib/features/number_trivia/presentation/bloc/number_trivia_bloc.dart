@@ -37,6 +37,8 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     NumberTriviaEvent event,
   ) async* {
     if (event is GetTriviaForConcreteNumber) {
+      yield Empty();
+
       final inputEither =
           inputConverter.stringToUnsignedInteger(event.numberString);
 
@@ -52,6 +54,7 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
         },
       );
     } else if (event is GetTriviaForRandomNumber) {
+      yield Empty();
       yield Loading();
       final failureOrTrivia = await getRandomNumberTrivia(NoParams());
       yield* _eitherLoadedOrErrorState(failureOrTrivia);
